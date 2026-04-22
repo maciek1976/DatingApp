@@ -25,7 +25,9 @@ public class MemberRepository(AppDbContext context) : IMemberRepository
 
     public async Task<Member?> GetMemberByIdAsync(string id)
     {
-        return await _context.Members.FindAsync(id);
+        return await _context.Members
+            .Include(x => x.User)
+            .SingleOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<IReadOnlyList<Photo>> GetPhotosForMemberAsync(string memberId)
@@ -34,5 +36,10 @@ public class MemberRepository(AppDbContext context) : IMemberRepository
             .Where(m => m.Id == memberId)
             .SelectMany(m => m.Photos)
             .ToListAsync();
+    }
+
+    public async Task<Member?> GetMemberFoUpdatesAsync(string id)
+    {
+        return await _context.Members.FindAsync(id);
     }
 }
